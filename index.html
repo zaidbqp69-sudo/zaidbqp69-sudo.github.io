@@ -3060,9 +3060,22 @@ function setupAudioPlayer(){
 }
 function updateAudioUI(){const u=window.hikayatAudioUI;if(!u)return;const a=currentAudio;if(!a){if(u.stop)u.stop.hidden=true;if(playBtn)playBtn.textContent='🔊 تشغيل التسجيل';if(u.status)u.status.textContent='جاهز للاستماع';return;}if(u.stop)u.stop.hidden=a.paused;if(playBtn)playBtn.textContent=a.paused?'▶ استئناف التسجيل':'Ⅱ إيقاف مؤقت';if(u.status)u.status.textContent=a.readyState<3?'جارٍ تحميل التسجيل…':a.error?'تعذر تحميل التسجيل':a.paused?'متوقف مؤقتًا':'يعمل الآن';if(isFinite(a.duration)){u.seek.value=(a.currentTime/a.duration)*100;u.time.textContent=fmtTime(a.currentTime)+' / '+fmtTime(a.duration)}}
 
-function updateSaveStoryButton(story){
+async function storyOfflineCacheAvailable(story){
+  if(!story || !savedOfflineStories.has(story.id) || !('caches' in window)) return false;
+  try{
+    const cacheNames=await caches.keys();
+    for(const name of cacheNames.filter(n=>n.includes('-stories'))){
+      const cache=await caches.open(name);
+      if(story.audioUrl && await cache.match(story.audioUrl)) return true;
+      if(!story.audioUrl && (await cache.match(location.origin+'/index.html') || await cache.match(location.origin+'/'))) return true;
+    }
+  }catch(e){}
+  return false;
+}
+async function updateSaveStoryButton(story){
   if(!saveStoryBtn) return;
-  const saved = !!story && savedOfflineStories.has(story.id);
+  let saved = !!story && await storyOfflineCacheAvailable(story);
+  if(story && savedOfflineStories.has(story.id) && !saved){ savedOfflineStories.delete(story.id); localStorage.setItem('talevo:savedOfflineStories', JSON.stringify(Array.from(savedOfflineStories))); }
   saveStoryBtn.classList.toggle('saved', saved);
   saveStoryBtn.textContent = saved ? '✓ محفوظة دون اتصال — اضغط للحذف' : '⇩ حفظ القصة للعمل دون اتصال';
   saveStoryBtn.setAttribute('aria-pressed', String(saved));
@@ -3079,7 +3092,8 @@ function workerRequest(worker, message){
 async function saveStoryOffline(){
   if(!currentStory || !saveStoryBtn) return;
   const story = currentStory;
-  if(savedOfflineStories.has(story.id)) { await deleteStoryOffline(story); return; }
+  if(savedOfflineStories.has(story.id) && await storyOfflineCacheAvailable(story)) { await deleteStoryOffline(story); return; }
+  savedOfflineStories.delete(story.id);
   saveStoryBtn.disabled = true;
   saveStoryBtn.textContent = 'جارٍ حفظ القصة…';
   try {
