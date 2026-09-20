@@ -1,10 +1,10 @@
 /* talevo offline Service Worker */
-const VERSION = 'talevo-offline-v1';
+const VERSION = 'talevo-offline-v2';
 const APP_CACHE = `${VERSION}-app`;
 const STORY_CACHE = `${VERSION}-stories`;
 const APP_SHELL = [
   './',
-  './talevo(7).html',
+  './index.html',
   './manifest.webmanifest',
   './service-worker-hikayat-complete.js'
 ];
@@ -53,7 +53,7 @@ async function networkFirst(request) {
     }
     return response;
   } catch (error) {
-    const cached = await caches.match(request) || await caches.match('./talevo(7).html') || await caches.match('./');
+    const cached = await caches.match(request) || await caches.match('./index.html') || await caches.match('./');
     return cached || new Response('التطبيق غير متاح دون اتصال. افتحه مرة واحدة أثناء الاتصال بالإنترنت.', { status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
   }
 }
