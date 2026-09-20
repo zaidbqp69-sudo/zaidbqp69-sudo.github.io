@@ -1,0 +1,23 @@
+{
+  "name": "talevo — تعلّم الإنجليزية بالقصص",
+  "short_name": "talevo",
+  "description": "تعلّم الإنجليزية بالقصص والتدريب التفاعلي",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#1B1A2E",
+  "background_color": "#1B1A2E",
+  "categories": ["education", "books"],
+  "icons": [
+    {
+      "src": "talevo-logo.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "prefer_related_applications": false
+}
