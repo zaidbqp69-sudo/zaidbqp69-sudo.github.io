@@ -1,5 +1,5 @@
 /* talevo offline Service Worker */
-const VERSION = 'talevo-offline-v3';
+const VERSION = 'talevo-offline-v4';
 const APP_CACHE = `${VERSION}-app`;
 const STORY_CACHE = 'talevo-stories';
 const APP_SHELL = [
